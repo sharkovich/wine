@@ -557,6 +557,15 @@ static void fill_device_info(PhysDevice *dev, pa_proplist *p)
 
     if ((buffer = pa_proplist_gets(p, PA_PROP_DEVICE_PRODUCT_ID)))
         dev->product_id = strtol(buffer, NULL, 16);
+
+    /* Some games with DualSense support need the audio device to be called "Wireless Controller" */
+    if (dev->vendor_id == 0x054c && dev->product_id == 0x0ce6) {
+        WCHAR *new_name = get_device_name("Wireless Controller", NULL);
+        if (new_name) {
+          free(dev->name);
+          dev->name = new_name;
+        }
+    }
 }
 
 static void pulse_add_device(struct list *list, pa_proplist *proplist, int index, EndpointFormFactor form,
